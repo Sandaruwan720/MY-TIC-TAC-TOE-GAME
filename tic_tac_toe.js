@@ -1,8 +1,7 @@
 // Select cells and message
-const cells = document.querySelectorAll('[data-cell]');
+const cells = Array.from(document.querySelectorAll('[data-cell]'));
 const messageElement = document.getElementById('message');
 let isXTurn = true; // Track whose turn it is
-let players = localStorage.getItem('players') || 2; // Get number of players
 let difficulty = localStorage.getItem('difficulty') || 'easy'; // Get difficulty
 
 // difficulty
@@ -12,17 +11,6 @@ document.querySelectorAll('input[name="difficulty"]').forEach(radio => {
         localStorage.setItem('difficulty', difficulty);
     });
 });
-
-// Set the number of players and reset the game
-function setPlayers(num) {
-    players = num;
-    localStorage.setItem('players', num);
-    resetGame();
-    document.querySelectorAll('.player-buttons button').forEach(button => {
-        button.classList.remove('active');
-    });
-    document.querySelector(`.player-buttons button:nth-child(${num})`).classList.add('active');
-}
 
 // Reset the game board
 function resetGame() {
@@ -34,9 +22,6 @@ function resetGame() {
     });
     messageElement.textContent = '';
     isXTurn = true;
-    if (players == 1 && !isXTurn) {
-        setTimeout(computerMove, 500);
-    }
 }
 
 // Add click event listeners to cells
@@ -51,7 +36,7 @@ function handleClick(e) {
     placeMark(cell, currentClass);
     if (checkWin(currentClass)) {
         messageElement.textContent = `${currentClass} wins!`;
-        messageElement.style.top = 'auto';
+        messageElement.style.top = '';
         messageElement.style.bottom = '20px';
     } else if (isDraw()) {
         messageElement.textContent = 'Draw!';
@@ -59,7 +44,7 @@ function handleClick(e) {
         messageElement.style.bottom = '20px';
     } else {
         swapTurns();
-        if (players === 1 && !isXTurn) {
+        if (!isXTurn) {
             setTimeout(computerMove, 500);
         }
     }
@@ -183,6 +168,6 @@ function minimax(cells, depth, isMaximizing) {
 
 // saved settings on page load
 document.addEventListener('DOMContentLoaded', () => {
-    setPlayers(players);
+    resetGame();
     document.getElementById(difficulty).checked = true;
 });
